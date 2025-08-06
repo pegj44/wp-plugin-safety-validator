@@ -2,16 +2,17 @@
 
 /**
  * Plugin Name: WP Plugin Safety Validator
- * Plugin URI:
- * Description: Validate plugins and themes for security issues.
+ * Description: Validate plugins for version compatibility and security vulnerabilities.
  * Version: 1.0.0
+ * License: GPL v2 or later
+ * Plugin URI:
  * Text Domain: wp_plugin_safety_validator
  * Domain: wp_plugin_safety_validator
  * Domain Path: /languages
  * Author: Paul Edmund Janubas
  * Author URI: https://www.linkedin.com/in/paul-edmund-janubas/
  * Requires at least: 4.6
- * License: GPL v2 or later
+ * Requires PHP: 7.4
  */
 
 namespace WP_PluginSafetyValidator;
