@@ -17,12 +17,11 @@
 
 namespace WP_PluginSafetyValidator;
 
-use WP_PluginSafetyValidator\Plugins\Loader;
-
 if (!defined('ABSPATH')) die('Access denied.');
 
 define('WP_PLUGIN_SAFETY_VALIDATOR_DIR', dirname(__FILE__));
 define('WP_PLUGIN_SAFETY_VALIDATOR_URL', plugins_url('', __FILE__));
+define('WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN', 'wp-plugin-safety-validator');
 
 if (!class_exists('WP_PluginSafetyValidator')) :
 
@@ -59,6 +58,9 @@ class WP_PluginSafetyValidator
     const PHP_VERSION_REQUIRED = '7.4'; // The minimum PHP version required
     const WP_VERSION_REQUIRED = '5.6'; // The minimum WordPress version required
 
+    protected $modules;
+    protected $plugins;
+
     protected static $_instance;
 
     /**
@@ -84,28 +86,72 @@ class WP_PluginSafetyValidator
     {
         $this->load_admin_instance();
         $this->load_frontend_instance();
-
-        add_action('plugins_loaded', [$this, 'init']);
+        $this->load_modules();
+        $this->load_plugins();
     }
 
     /**
-     * Initialize the plugin
+     * Load the module classes.
      *
      * @return void
      */
-    public function init(): void
+    public function load_modules(): void
     {
-        $this->load_plugin_loader_instance();
+        $this->modules = new Loader(WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/classes/modules/*.php', 'WP_PluginSafetyValidator\\Modules');
+        $this->modules->load_classes();
     }
 
     /**
-     * Load the plugin loader instance
+     * Load the plugin extension classes.
      *
      * @return void
      */
-    private function load_plugin_loader_instance(): void
+    public function load_plugins(): void
     {
-        Loader::instance();
+        $this->plugins = new Loader(WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/classes/plugins/*.php', 'WP_PluginSafetyValidator\\Plugins');
+        $this->plugins->load_classes();
+    }
+
+    /**
+     * Get the instance of a module
+     *
+     * @param $module_name
+     * @return mixed
+     */
+    public function get_module_instance($module_name)
+    {
+        return $this->modules->get_class_instance($module_name);
+    }
+
+    /**
+     * Get all instances of the module classes
+     *
+     * @return mixed
+     */
+    public function get_all_module_instances()
+    {
+        return $this->modules->get_all_class_instances();
+    }
+
+    /**
+     * Get the instance of a plugin
+     *
+     * @param $plugin_name
+     * @return mixed
+     */
+    public function get_plugin_instance($plugin_name)
+    {
+        return $this->plugins->get_class_instance($plugin_name);
+    }
+
+    /**
+     * Get all the instances of the plugin classes
+     *
+     * @return mixed
+     */
+    public function get_all_plugin_instances()
+    {
+        return $this->plugins->get_all_class_instances();
     }
 
     /**
