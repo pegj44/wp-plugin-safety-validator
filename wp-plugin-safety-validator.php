@@ -19,6 +19,7 @@ namespace WP_PluginSafetyValidator;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
+define('WP_PLUGIN_SAFETY_VALIDATOR_VERSION', '1.0.0');
 define('WP_PLUGIN_SAFETY_VALIDATOR_DIR', dirname(__FILE__));
 define('WP_PLUGIN_SAFETY_VALIDATOR_URL', plugins_url('', __FILE__));
 define('WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN', 'wp-plugin-safety-validator');
@@ -86,6 +87,7 @@ class WP_PluginSafetyValidator
     {
         $this->load_admin_instance();
         $this->load_frontend_instance();
+        $this->load_template_instance();
         $this->load_modules();
         $this->load_plugins();
     }
@@ -192,6 +194,26 @@ class WP_PluginSafetyValidator
     public function get_frontend_instance(): Frontend
     {
         return Frontend::instance();
+    }
+
+    /**
+     * Load the template instance
+     *
+     * @return void
+     */
+    public function load_template_instance(): void
+    {
+        $this->get_template_instance();
+    }
+
+    /**
+     * Get the template instance
+     *
+     * @return Template
+     */
+    public function get_template_instance(): Template
+    {
+        return Template::instance();
     }
 } // end class
 
