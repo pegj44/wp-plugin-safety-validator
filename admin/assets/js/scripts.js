@@ -28,6 +28,13 @@
                     if (response.success) {
                         if (response.data.results.length > 0) {
                             btn.addClass('wp-psv-scan_complete_with_issues');
+
+                            const pluginEl = $('tr[data-slug="akismet"][data-plugin="akismet/akismet.php"]:not([id])');
+                            const targetEl = pluginEl[0];
+                            if (!targetEl) return;
+
+                            targetEl.insertAdjacentHTML('afterend', response.data.html.trim());
+
                         } else {
                             btn.addClass('wp-psv-scan_complete_no_issues');
                         }

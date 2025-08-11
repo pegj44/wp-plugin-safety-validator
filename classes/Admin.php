@@ -31,9 +31,6 @@ class Admin
     {
         $this->register_ajax_actions($this);
 
-//        delete_option(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_wf_scan_record');
-//        delete_option(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_wpv_scan_record');
-
         add_action( 'after_plugin_row', [$this, 'render_notice_row'], 10, 3 );
         add_action( 'admin_enqueue_scripts', [$this, 'enqueue_scripts'] );
         add_filter( 'plugin_action_links', [$this, 'add_scan_plugin_button'], 9999, 4 );
@@ -63,7 +60,7 @@ class Admin
             $plugin_data = [
                 'plugin_file' => preg_replace('#(\.\.|[\\\\]+|//+|\x00)#','', $_POST['plugin_file']),
                 'slug' => sanitize_text_field($_POST['slug']),
-                'version' => sanitize_text_field($_POST['version']),
+                'Version' => sanitize_text_field($_POST['version']),
             ];
 
             $WF_data_feed = WordFenceVulnerabilityDataFeed::instance();
@@ -75,7 +72,8 @@ class Admin
             $results = array_filter([$wp_vuln_response, $wf_response]);
 
             wp_send_json_success([
-                'results' => $results
+                'results' => $results,
+                'html' => $this->get_plugin_issue_html($plugin_data['plugin_file'], $plugin_data)
             ]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
@@ -85,27 +83,32 @@ class Admin
         }
     }
 
-    public function render_notice_row( $plugin_file, $plugin_data, $status )
+    public function render_notice_row( $plugin_file, $plugin_data, $status ): void
     {
-        $found_vulnerabilities = $this->get_vulnerabilities($plugin_data);
+        echo $this->get_plugin_issue_html($plugin_file, $plugin_data);
+    }
+
+    public function get_plugin_issue_html($plugin_file, $plugin_data, $data = []): string
+    {
+        $found_vulnerabilities = $this->get_vulnerabilities($plugin_data, $data);
 
         if ( empty($found_vulnerabilities)) {
-            return;
+            return '';
         }
 
         $classes = 'plugin-update-tr custom-plugin-row-notice';
-        if ( 'active' === $status || is_plugin_active( $plugin_file ) ) {
+        if ( is_plugin_active( $plugin_file ) ) {
             $classes .= ' active';
         }
 
         $message = 'IMPORTANT! - This plugin has been identified as vulnerable to a known security issue. Please update as soon as possible.';
 
-        Template::load_admin_view('plugin-issue-notification', [
+        return Template::load_admin_view('plugin-issue-notification', [
             'classes' => $classes,
             'plugin_file' => $plugin_file,
             'message' => $message,
             'vulnerabilities' => $found_vulnerabilities
-        ], true);
+        ]);
     }
 
     /**
@@ -134,9 +137,20 @@ class Admin
         return $actions;
     }
 
-    private function get_vulnerabilities($plugin_data): array
+    private function get_vulnerabilities($plugin_data, $data = []): array
     {
         global $wp_plugin_vulnerabilities;
+
+        if ( !empty($data) ) {
+            $wp_plugin_vulnerabilities = $data;
+        }
+
+        if (empty($wp_plugin_vulnerabilities)) {
+            $wp_plugin_vulnerabilities = [
+                'wordfence' => get_option(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_wf_scan_record', []),
+                'wpvulnerability' => get_option(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_wpv_scan_record', [])
+            ];
+        }
 
         $slug = (isset($plugin_data['slug'])? $plugin_data['slug'] : '');
         $found_vulnerabilities = [];
