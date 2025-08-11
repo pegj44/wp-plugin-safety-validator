@@ -1,0 +1,46 @@
+.el-not-ready,
+.el-not-ready:hover {
+    color: gray;
+    cursor: default;
+}
+.wp-psv-scan_complete_no_issues_txt {
+    color: green;
+    display: none;
+    cursor: default;
+}
+.wp-psv-scan_complete_with_issues_txt {
+    color: red;
+    display: none;
+    cursor: default;
+}
+.wp-psv-scanning_btn,
+.wp-psv-scan_complete_btn {
+    display: none;
+    color: gray;
+    cursor: default;
+}
+.wp-psv-scanning  {
+    .wp-psv-scanning_btn {
+        display: inline-block;
+    }
+    .wp-psv-scan_btn {
+        display: none;
+    }
+}
+.wp-psv-scan_complete_with_issues,
+.wp-psv-scan_complete_no_issues {
+    .wp-psv-scanning_btn,
+    .wp-psv-scan_btn {
+        display: none;
+    }
+}
+.wp-psv-scan_complete_with_issues {
+    .wp-psv-scan_complete_with_issues_txt {
+        display: inline-block;
+    }
+}
+.wp-psv-scan_complete_no_issues {
+    .wp-psv-scan_complete_no_issues_txt {
+        display: inline-block;
+    }
+}

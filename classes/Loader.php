@@ -4,21 +4,29 @@ namespace WP_PluginSafetyValidator;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
+/**
+ * This class handles the loading of all the modules and plugin extensions
+ */
 class Loader
 {
-    protected $module_dir;
+    protected $classDir;
+    protected $classBaseDir;
     protected $namespace;
     protected $instances = [];
 
-    public function __construct($module_dir, $namespace)
+    public function __construct($classDir)
     {
-        $this->module_dir = $module_dir;
-        $this->namespace = $namespace;
+        $this->classBaseDir = basename($classDir);
+        $this->classDir = WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/classes/'. $classDir .'/*.php';
+        $this->namespace = 'WP_PluginSafetyValidator\\'. ucfirst($classDir);
+
+        // Store in a filter hook to allow other plugins or themes to register their classes or exclude classes
+        add_filter(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'-register_'. $this->classBaseDir, [$this, 'register_classes'], 10);
     }
 
-    public function load_classes(): void
+    public function register_classes( array $classes ): array
     {
-        foreach (glob($this->module_dir) as $file) {
+        foreach (glob($this->classDir) as $file) {
             $classFile = basename($file, '.php');
             $className = $this->namespace ? $this->namespace . '\\' . $classFile : $classFile;
 
@@ -26,8 +34,19 @@ class Loader
                 !isset($this->instances[$classFile]) &&
                 method_exists($className, 'instance')) {
 
-                $this->instances[$classFile] = $className::instance();
+                $classes[$classFile] = $className;
             }
+        }
+
+        return $classes;
+    }
+
+    public function load_classes(): void
+    {
+        $invokeClasses = apply_filters( WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'-register_'. $this->classBaseDir, [] );
+
+        foreach ($invokeClasses as $class => $class_instance) {
+            $this->instances[$class] = $class_instance::instance();
         }
     }
 

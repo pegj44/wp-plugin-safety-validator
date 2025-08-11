@@ -27,31 +27,18 @@ define('WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN', 'wp-plugin-safety-validator');
 if (!class_exists('WP_PluginSafetyValidator')) :
 
 /**
- * Autoload classes
- */
-spl_autoload_register( function ( $class ) {
-    $prefix = 'WP_PluginSafetyValidator\\';
-    $base_dir = WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/classes/';
-    $len = strlen( $prefix );
-
-    if ( strncmp( $prefix, $class, $len ) !== 0 ) {
-        return;
-    }
-
-    $relative_class = substr( $class, $len );
-    $file = $base_dir . str_replace( '\\', '/', $relative_class ) . '.php';
-
-    if ( file_exists( $file ) ) {
-        require $file;
-    }
-});
-
-/**
  * The main class of the plugin
  *
  * @package WP_PluginSafetyValidator
  * @since 1.0.0
  *
+ * @todo
+ * - Add PHP version compatibility check
+ * - Add WordPress version compatibility check
+ * - Add malicious code detection
+ * - Add change log checker - Checks for function deprecation and other changes that may affect custom code extensions
+ * - Add WordPress deprecated functions checker
+ * - Add a Plugin abandon checker
  */
 class WP_PluginSafetyValidator
 {
@@ -85,11 +72,27 @@ class WP_PluginSafetyValidator
      */
     public function __construct()
     {
+        add_action( 'plugins_loaded', [$this, 'load_classes'], 10 );
+    }
+
+    public function load_classes(): void
+    {
+        $this->load_vendor();
         $this->load_admin_instance();
         $this->load_frontend_instance();
         $this->load_template_instance();
         $this->load_modules();
         $this->load_plugins();
+    }
+
+    /**
+     * Load the vendor classes.
+     *
+     * @return void
+     */
+    public function load_vendor(): void
+    {
+        require_once WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/vendor/autoload.php';
     }
 
     /**
@@ -99,7 +102,7 @@ class WP_PluginSafetyValidator
      */
     public function load_modules(): void
     {
-        $this->modules = new Loader(WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/classes/modules/*.php', 'WP_PluginSafetyValidator\\Modules');
+        $this->modules = new Loader('modules');
         $this->modules->load_classes();
     }
 
@@ -110,7 +113,7 @@ class WP_PluginSafetyValidator
      */
     public function load_plugins(): void
     {
-        $this->plugins = new Loader(WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/classes/plugins/*.php', 'WP_PluginSafetyValidator\\Plugins');
+        $this->plugins = new Loader('plugins');
         $this->plugins->load_classes();
     }
 
@@ -232,4 +235,4 @@ function WP_PluginSafetyValidator(): WP_PluginSafetyValidator
 /**
  * Store the singleton instance of the WP_PluginSafetyValidator class in the global scope
  */
-$_GLOBALS['wp_plugin_safety_validator'] = WP_PluginSafetyValidator();
+$GLOBALS['wp_plugin_safety_validator'] = WP_PluginSafetyValidator();

@@ -44,6 +44,7 @@ class Template
      *
      * @param string $handle                    Script handle.
      * @param string[] $deps                    Dependencies to add/merge.
+     * @param array $args                       Localized arguments to add/merge.
      * @param bool|null $in_footer              true=footer, false=header, null=no change.
      * @param string $src                       If not registered, register with this src.
      * @param bool|string|null $ver             Version (false to omit).
@@ -51,7 +52,7 @@ class Template
      * @param string|null $current_page         Pass $hook_suffix from admin_enqueue_scripts for accuracy.
      * @return bool                             True if enqueued, false otherwise.
      */
-    public static function enqueue_script(string $handle, array $deps = [], bool $in_footer = null, string $src = '', bool|string $ver = null, array|string $only_on = [], string $current_page = null ): bool
+    public static function enqueue_script(string $handle, array $deps = [], array $args = [], bool $in_footer = null, string $src = '', bool|string $ver = null, array|string $only_on = [], string $current_page = null ): bool
     {
         if ( ! $handle ) {
             return false;
@@ -114,6 +115,10 @@ class Template
         }
 
         wp_enqueue_script( $handle );
+
+        if (!empty($args)) {
+            wp_localize_script($handle, str_replace('-', '_', $handle), $args);
+        }
 
         return true;
     }

@@ -11,7 +11,6 @@ if (!defined('ABSPATH')) die('Access denied.');
  * Each config: [
  *    'interval_slug' => (string),
  *    'interval_args' => (array),
- *    'hook'          => (string),
  *    'callback'      => (callable|string),
  * ]
  */
@@ -39,12 +38,12 @@ trait SchedulerTrait
     public function load_custom_schedules(): void
     {
         foreach ($this->safe_get_schedules() as $schedule) {
+            $hook = $this->get_hook_name($schedule['callback']);
             if (
-                isset($schedule['hook'], $schedule['callback']) &&
-                is_string($schedule['hook'])
+                isset($hook, $schedule['callback'])
             ) {
                 add_action(
-                    $schedule['hook'],
+                    $hook,
                     is_string($schedule['callback']) ? [$this, $schedule['callback']] : $schedule['callback']
                 );
             }
@@ -58,7 +57,7 @@ trait SchedulerTrait
      * @param array $schedules Existing WP cron schedules.
      * @return array Modified schedules array with custom intervals.
      */
-    public function add_custom_intervals($schedules) : array
+    public function add_custom_intervals(array $schedules) : array
     {
         foreach ($this->safe_get_schedules() as $schedule) {
             if (!empty($schedule['interval_args']) && isset($schedule['interval_slug'])) {
@@ -77,12 +76,18 @@ trait SchedulerTrait
     public function schedule_events(): void
     {
         foreach ($this->safe_get_schedules() as $schedule) {
-            if (isset($schedule['hook'], $schedule['interval_slug']) && is_string($schedule['hook'])) {
-                if (!wp_next_scheduled($schedule['hook'])) {
-                    wp_schedule_event(time(), $schedule['interval_slug'], $schedule['hook']);
+            $hook = $this->get_hook_name($schedule['callback']);
+            if (isset($hook, $schedule['interval_slug'])) {
+                if (!wp_next_scheduled($hook)) {
+                    wp_schedule_event(time(), $schedule['interval_slug'], $hook);
                 }
             }
         }
+    }
+
+    private function get_hook_name($hook): string
+    {
+        return WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_'. $hook;
     }
 
     /**

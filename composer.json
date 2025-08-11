@@ -1,0 +1,14 @@
+{
+  "require": {
+    "woocommerce/action-scheduler": "3"
+  },
+  "autoload": {
+    "psr-4": {
+      "WP_PluginSafetyValidator\\": "classes/"
+    }
+  },
+  "require-dev": {
+    "kint-php/kint": "^3.2",
+    "kint-php/kint-js": "^2.0"
+  }
+}
