@@ -14,12 +14,27 @@ trait AjaxTrait
 
     public $nonce = [];
 
-    public function initiate_ajax_actions(): void
+    public function initiate_admin_ajax_actions(): void
     {
-        add_action('plugins_loaded', [$this, 'bootstrap_ajax_actions']);
+        add_action('plugins_loaded', [$this, 'bootstrap_admin_ajax_actions']);
     }
 
-    public function bootstrap_ajax_actions(): void
+    public function initiate_frontend_ajax_actions(): void
+    {
+        add_action( 'plugins_loaded', [$this, 'bootstrap_frontend_ajax_actions'] );
+    }
+
+    public function bootstrap_admin_ajax_actions(): void
+    {
+        $this->initiate_ajax_actions('admin');
+    }
+
+    public function bootstrap_frontend_ajax_actions(): void
+    {
+        $this->initiate_ajax_actions('frontend');
+    }
+
+    private function initiate_ajax_actions($context): void
     {
         $ajaxActions = $this->get_ajax_actions();
 
@@ -29,28 +44,37 @@ trait AjaxTrait
                 $actionName = str_replace(['handle_ajax_', 'bothpriv_', 'nopriv_'], '', $ajaxAction);
 
                 if (str_contains($ajaxAction, 'handle_ajax_nopriv_')) {
-                    add_action( 'wp_ajax_nopriv_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .$actionName, [$this, $ajaxAction] );
+                    add_action( 'wp_ajax_nopriv_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_'. $actionName, [$this, $ajaxAction] );
                 }
                 if(str_contains($ajaxAction, 'handle_ajax_bothpriv_')) {
-                    add_action('wp_ajax_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .$actionName, [$this, $ajaxAction]);
-                    add_action('wp_ajax_nopriv_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .$actionName, [$this, $ajaxAction]);
+                    add_action('wp_ajax_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_'. $actionName, [$this, $ajaxAction]);
+                    add_action('wp_ajax_nopriv_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_'. $actionName, [$this, $ajaxAction]);
                 }
                 if(!str_contains($ajaxAction, 'handle_ajax_bothpriv_') && !str_contains($ajaxAction, 'handle_ajax_nopriv_')){
-                    add_action('wp_ajax_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .$actionName, [$this, $ajaxAction]);
+                    add_action('wp_ajax_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_'. $actionName, [$this, $ajaxAction]);
                 }
 
                 $this->nonce[$actionName] = $this->create_nonce($actionName);
             }
 
-//                add_action('wp_head', [$this, 'add_nonce_to_header']);
+            if ($context === 'admin') {
+                add_action('admin_head', [$this, 'add_nonce_to_header']);
+            }
+
+            if ($context === 'frontend') {
+                add_action('wp_head', [$this, 'add_nonce_to_header']);
+            }
         }
     }
 
-    public function add_nonce_to_header()
+    public function add_nonce_to_header(): void
     {
-        json_encode([
-            WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_nonce' => $this->nonce,
-        ]);
+        echo '<script type="text/javascript">';
+            echo 'const '. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_ajax = '. wp_json_encode([
+                'ajax_url' => admin_url( 'admin-ajax.php' ),
+                'nonce' => $this->nonce,
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+        echo '</script>';
     }
 
     private function get_ajax_actions()

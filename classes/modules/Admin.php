@@ -29,7 +29,7 @@ class Admin
 
     public function __construct()
     {
-        $this->initiate_ajax_actions();
+        $this->initiate_admin_ajax_actions();
 
         add_action( 'after_plugin_row', [$this, 'render_notice_row'], 10, 3 );
         add_action( 'admin_enqueue_scripts', [$this, 'enqueue_scripts'] );
@@ -38,20 +38,13 @@ class Admin
 
     public function enqueue_scripts(): void
     {
-        Template::enqueue_script('scripts', ['jquery'], [
-            'ajax_url' => admin_url( 'admin-ajax.php' ),
-            'scan_action' => $this->set_action('scan_plugin'),
-            'scan_nonce' => $this->create_nonce('scan_nonce')
-        ], true);
-
+        Template::enqueue_script('scripts', ['jquery'], [], true);
         Template::enqueue_style('styles');
     }
 
     public function handle_ajax_scan_plugin(): void
     {
-        if ($this->check_ajax_referer('nonceTest')) {
-            return;
-        }
+        $this->check_ajax_referer('scan_plugin');
 
         if (!isset($_POST['plugin_file'])) {
             wp_send_json_error([

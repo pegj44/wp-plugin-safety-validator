@@ -18,7 +18,7 @@ class PluginScannerHandler
      * @var string[]
      */
     private $plugin_scanner_classes = [
-        'WP_PluginSafetyValidator\Modules\WordFenceVulnerabilityDataFeed',
+//        'WP_PluginSafetyValidator\Modules\WordFenceVulnerabilityDataFeed',
         'WP_PluginSafetyValidator\Modules\WpVulnerabilityDataFeed'
     ];
 

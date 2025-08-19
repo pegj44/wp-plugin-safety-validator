@@ -27,19 +27,21 @@
 
     $(document).ready(function($)
     {
+        console.log(wp_plugin_safety_validator_ajax);
+
         $('.el-not-ready').removeClass('el-not-ready');
 
-        $(document).on('click', 'a.wp-plugin-safety-validator-scan_button:not(.wp-psv-scanning):not(.wp-psv-scan_complete)', function(e) {
+        $(document).on('click', 'a.wp_plugin_safety_validator-scan_button:not(.wp-psv-scanning):not(.wp-psv-scan_complete)', function(e) {
             e.preventDefault();
             const btn = $(this);
             btn.addClass('wp-psv-scanning');
             $.ajax({
-                url: wp_plugin_safety_validator_scripts.ajax_url,
+                url: wp_plugin_safety_validator_ajax.ajax_url,
                 method: 'POST',
                 dataType: 'json',
                 data: {
-                    action: wp_plugin_safety_validator_scripts.scan_action,
-                    nonce: wp_plugin_safety_validator_scripts.scan_nonce,
+                    action: 'wp_plugin_safety_validator_scan_plugin',
+                    nonce: wp_plugin_safety_validator_ajax.nonce.scan_plugin,
                     plugin_file: $(this).data('plugin_file'),
                     slug: $(this).data('slug'),
                     version: $(this).data('version'),
@@ -53,7 +55,7 @@
                         if (response.data.results.length > 0) {
                             btn.addClass('wp-psv-scan_complete_with_issues');
 
-                            const pluginEl = $('tr[data-slug="'+ slug +'"][data-plugin="'+ plugin_file +'"]:not([id])');
+                            const pluginEl = $('tr[data-slug="'+ btn.attr('data-slug') +'"][data-plugin="'+ btn.attr('data-plugin_file') +'"]:not([id])');
                             const targetEl = pluginEl[0];
                             if (!targetEl) return;
 
