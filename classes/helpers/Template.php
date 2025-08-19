@@ -1,6 +1,6 @@
 <?php
 
-namespace WP_PluginSafetyValidator;
+namespace WP_PluginSafetyValidator\Helpers;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
@@ -20,22 +20,17 @@ class Template
         return self::$_instance;
     }
 
-    public function __construct()
-    {
-        add_action( 'admin_init', [$this, 'initiate_register_styles_and_scripts'] );
-    }
-
     /**
      * Initiate the register styles and scripts.
      *
      * @return void
      */
-    public function initiate_register_styles_and_scripts(): void
+    public static function initiate_register_styles_and_scripts(): void
     {
-        $this->register_styles_and_scripts('js', 'admin'); // register admin scripts
-        $this->register_styles_and_scripts('css', 'admin'); // register admin styles
-        $this->register_styles_and_scripts('js'); // register frontend scripts
-        $this->register_styles_and_scripts('css'); // register frontend styles
+        self::register_styles_and_scripts('js', 'admin'); // register admin scripts
+        self::register_styles_and_scripts('css', 'admin'); // register admin styles
+        self::register_styles_and_scripts('js'); // register frontend scripts
+        self::register_styles_and_scripts('css'); // register frontend styles
     }
 
     /**
@@ -60,7 +55,7 @@ class Template
 
         $handle = WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'-'. $handle;
 
-        // Admin-page filter.
+        // example: Admin-page filter.
         $only_on = array_filter( array_unique( (array) $only_on ) );
         if ( !empty( $only_on ) ) {
             $matches = false;
@@ -208,7 +203,7 @@ class Template
      * @param string $context
      * @return void
      */
-    public function register_styles_and_scripts(string $type, string $context = 'frontend'): void
+    public static function register_styles_and_scripts(string $type, string $context = 'frontend'): void
     {
         $file_dir = WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/'. $context .'/assets/'. $type .'/';
         $file_url = WP_PLUGIN_SAFETY_VALIDATOR_URL . '/'. $context .'/assets/'. $type .'/';

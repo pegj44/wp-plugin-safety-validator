@@ -5,234 +5,45 @@
  * Description: Validate plugins for version compatibility and security vulnerabilities.
  * Version: 1.0.0
  * License: GPL v2 or later
- * Plugin URI:
  * Text Domain: wp_plugin_safety_validator
- * Domain: wp_plugin_safety_validator
  * Domain Path: /languages
  * Author: Paul Edmund Janubas
  * Author URI: https://www.linkedin.com/in/paul-edmund-janubas/
- * Requires at least: 4.6
- * Requires PHP: 7.4
+ * Requires at least: 5.6
+ * Requires PHP: 8.0
  */
 
 namespace WP_PluginSafetyValidator;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
-define('WP_PLUGIN_SAFETY_VALIDATOR_VERSION', '1.0.0');
-define('WP_PLUGIN_SAFETY_VALIDATOR_DIR', dirname(__FILE__));
-define('WP_PLUGIN_SAFETY_VALIDATOR_URL', plugins_url('', __FILE__));
-define('WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN', 'wp-plugin-safety-validator');
+if ( ! defined( 'WP_PLUGIN_SAFETY_VALIDATOR_VERSION' ) ) {
+    define( 'WP_PLUGIN_SAFETY_VALIDATOR_VERSION', '1.0.0' );
+}
+if ( ! defined( 'WP_PLUGIN_SAFETY_VALIDATOR_DIR' ) ) {
+    define( 'WP_PLUGIN_SAFETY_VALIDATOR_DIR', __DIR__ );
+}
+if ( ! defined( 'WP_PLUGIN_SAFETY_VALIDATOR_URL' ) ) {
+    define( 'WP_PLUGIN_SAFETY_VALIDATOR_URL', plugins_url( '', __FILE__ ) );
+}
+if ( ! defined( 'WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN' ) ) {
+    define( 'WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN', 'wp_plugin_safety_validator' );
+}
+
+require_once WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/vendor/autoload.php';
 
 if (!class_exists('WP_PluginSafetyValidator')) :
 
-/**
- * The main class of the plugin
- *
- * @package WP_PluginSafetyValidator
- * @since 1.0.0
- *
- * @todo
- * - Add PHP version compatibility check
- * - Add WordPress version compatibility check
- * - Add malicious code detection
- * - Add change log checker - Checks for function deprecation and other changes that may affect custom code extensions
- * - Add WordPress deprecated functions checker
- * - Add a Plugin abandon checker
- */
-class WP_PluginSafetyValidator
-{
-    const VERSION = '1.0.0';
-    const PHP_VERSION_REQUIRED = '7.4'; // The minimum PHP version required
-    const WP_VERSION_REQUIRED = '5.6'; // The minimum WordPress version required
-
-    protected $modules;
-    protected $plugins;
-
-    protected static $_instance;
-
     /**
-     * Get the singleton instance of the WP_PluginSafetyValidator class
+     * Create a singleton instance of the WP_PluginSafetyValidator class
      *
      * @return WP_PluginSafetyValidator
      */
-    public static function instance(): WP_PluginSafetyValidator
+    function WP_PluginSafetyValidator(): WP_PluginSafetyValidator
     {
-        if (empty(self::$_instance)) {
-            self::$_instance = new self();
-        }
-
-        return self::$_instance;
+        return WP_PluginSafetyValidator::instance();
     }
 
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        add_action( 'plugins_loaded', [$this, 'load_classes'], 10 );
-    }
-
-    public function load_classes(): void
-    {
-        $this->load_vendor();
-        $this->load_admin_instance();
-        $this->load_frontend_instance();
-        $this->load_template_instance();
-        $this->load_modules();
-        $this->load_plugins();
-    }
-
-    /**
-     * Load the vendor classes.
-     *
-     * @return void
-     */
-    public function load_vendor(): void
-    {
-        require_once WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/vendor/autoload.php';
-    }
-
-    /**
-     * Load the module classes.
-     *
-     * @return void
-     */
-    public function load_modules(): void
-    {
-        $this->modules = new Loader('modules');
-        $this->modules->load_classes();
-    }
-
-    /**
-     * Load the plugin extension classes.
-     *
-     * @return void
-     */
-    public function load_plugins(): void
-    {
-        $this->plugins = new Loader('plugins');
-        $this->plugins->load_classes();
-    }
-
-    /**
-     * Get the instance of a module
-     *
-     * @param $module_name
-     * @return mixed
-     */
-    public function get_module_instance($module_name)
-    {
-        return $this->modules->get_class_instance($module_name);
-    }
-
-    /**
-     * Get all instances of the module classes
-     *
-     * @return mixed
-     */
-    public function get_all_module_instances()
-    {
-        return $this->modules->get_all_class_instances();
-    }
-
-    /**
-     * Get the instance of a plugin
-     *
-     * @param $plugin_name
-     * @return mixed
-     */
-    public function get_plugin_instance($plugin_name)
-    {
-        return $this->plugins->get_class_instance($plugin_name);
-    }
-
-    /**
-     * Get all the instances of the plugin classes
-     *
-     * @return mixed
-     */
-    public function get_all_plugin_instances()
-    {
-        return $this->plugins->get_all_class_instances();
-    }
-
-    /**
-     * Load the admin instance
-     *
-     * @return void
-     */
-    private function load_admin_instance(): void
-    {
-        $this->get_admin_instance();
-    }
-
-    /**
-     * Get the admin instance
-     *
-     * @return Admin
-     */
-    public function get_admin_instance(): Admin
-    {
-        return Admin::instance();
-    }
-
-    /**
-     * Load the frontend instance
-     *
-     * @return void
-     */
-    private function load_frontend_instance(): void
-    {
-        $this->get_frontend_instance();
-    }
-
-    /**
-     * Get the frontend instance
-     *
-     * @return Frontend
-     */
-    public function get_frontend_instance(): Frontend
-    {
-        return Frontend::instance();
-    }
-
-    /**
-     * Load the template instance
-     *
-     * @return void
-     */
-    public function load_template_instance(): void
-    {
-        $this->get_template_instance();
-    }
-
-    /**
-     * Get the template instance
-     *
-     * @return Template
-     */
-    public function get_template_instance(): Template
-    {
-        return Template::instance();
-    }
-} // end class
+    WP_PluginSafetyValidator();
 
 endif;
-
-/**
- * Create a singleton instance of the WP_PluginSafetyValidator class
- *
- * @return WP_PluginSafetyValidator
- */
-function WP_PluginSafetyValidator(): WP_PluginSafetyValidator
-{
-    return WP_PluginSafetyValidator::instance();
-}
-
-/**
- * Store the singleton instance of the WP_PluginSafetyValidator class in the global scope
- */
-$GLOBALS['wp_plugin_safety_validator'] = WP_PluginSafetyValidator();

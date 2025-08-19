@@ -1,6 +1,30 @@
 
 (function ($)
 {
+    //pegj_
+
+    /**
+     * @todo JS library Concept for ajax request implementation
+     */
+    // const pegjConfig = new Pegj({
+    //    '.button': {
+    //        'data': {},
+    //        'trigger': 'click',
+    //        'networkTrigger': 'testTrigger',
+    //        'eventTrigger': 'testEventTrigger',
+    //        'createTrigger': 'createTriggerTest',
+    //        'ajaxHandle': 'show_hello_world',
+    //        'output': '.show-output',
+    //        'outputHandler': 'show_output',
+    //    }
+    // });
+    //
+    // function show_output(data, html)
+    // {
+    //     return html;
+    // }
+
+
     $(document).ready(function($)
     {
         $('.el-not-ready').removeClass('el-not-ready');
@@ -29,7 +53,7 @@
                         if (response.data.results.length > 0) {
                             btn.addClass('wp-psv-scan_complete_with_issues');
 
-                            const pluginEl = $('tr[data-slug="akismet"][data-plugin="akismet/akismet.php"]:not([id])');
+                            const pluginEl = $('tr[data-slug="'+ slug +'"][data-plugin="'+ plugin_file +'"]:not([id])');
                             const targetEl = pluginEl[0];
                             if (!targetEl) return;
 

@@ -12,35 +12,50 @@ trait AjaxTrait
         'handle_ajax_bothpriv_'
     ];
 
-    public function register_ajax_actions($obj): void
+    public $nonce = [];
+
+    public function initiate_ajax_actions(): void
     {
-        $ajaxActions = $this->get_ajax_actions($obj);
+        add_action('plugins_loaded', [$this, 'bootstrap_ajax_actions']);
+    }
+
+    public function bootstrap_ajax_actions(): void
+    {
+        $ajaxActions = $this->get_ajax_actions();
 
         if (!empty($ajaxActions)) {
+
             foreach ($ajaxActions as $ajaxAction) {
                 $actionName = str_replace(['handle_ajax_', 'bothpriv_', 'nopriv_'], '', $ajaxAction);
 
                 if (str_contains($ajaxAction, 'handle_ajax_nopriv_')) {
-                    add_action( 'wp_ajax_nopriv_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_'. $actionName, [$obj, $ajaxAction] );
+                    add_action( 'wp_ajax_nopriv_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .$actionName, [$this, $ajaxAction] );
                 }
                 if(str_contains($ajaxAction, 'handle_ajax_bothpriv_')) {
-                    add_action('wp_ajax_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_'. $actionName, [$obj, $ajaxAction]);
-                    add_action('wp_ajax_nopriv_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_'. $actionName, [$obj, $ajaxAction]);
+                    add_action('wp_ajax_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .$actionName, [$this, $ajaxAction]);
+                    add_action('wp_ajax_nopriv_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .$actionName, [$this, $ajaxAction]);
                 }
                 if(!str_contains($ajaxAction, 'handle_ajax_bothpriv_') && !str_contains($ajaxAction, 'handle_ajax_nopriv_')){
-                    add_action('wp_ajax_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_'. $actionName, [$obj, $ajaxAction]);
+                    add_action('wp_ajax_'. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .$actionName, [$this, $ajaxAction]);
                 }
+
+                $this->nonce[$actionName] = $this->create_nonce($actionName);
             }
+
+//                add_action('wp_head', [$this, 'add_nonce_to_header']);
         }
     }
 
-    private function get_ajax_actions($obj)
+    public function add_nonce_to_header()
     {
-        if (!is_object($obj)) {
-            throw new \InvalidArgumentException('Expected an object instance.');
-        }
+        json_encode([
+            WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_nonce' => $this->nonce,
+        ]);
+    }
 
-        $reflection = new \ReflectionClass($obj);
+    private function get_ajax_actions()
+    {
+        $reflection = new \ReflectionClass($this);
         $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
 
         return array_map(

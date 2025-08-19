@@ -1,10 +1,10 @@
 <?php
 
-namespace WP_PluginSafetyValidator;
+namespace WP_PluginSafetyValidator\Modules;
 
+use WP_PluginSafetyValidator\Helpers\Template;
 use WP_PluginSafetyValidator\Helpers\VersionChecker;
-use WP_PluginSafetyValidator\Modules\WordFenceVulnerabilityDataFeed;
-use WP_PluginSafetyValidator\Modules\WpVulnerabilityDataFeed;
+use WP_PluginSafetyValidator\PluginScannerHandler;
 use WP_PluginSafetyValidator\traits\AjaxTrait;
 
 if (!defined('ABSPATH')) die('Access denied.');
@@ -29,7 +29,7 @@ class Admin
 
     public function __construct()
     {
-        $this->register_ajax_actions($this);
+        $this->initiate_ajax_actions();
 
         add_action( 'after_plugin_row', [$this, 'render_notice_row'], 10, 3 );
         add_action( 'admin_enqueue_scripts', [$this, 'enqueue_scripts'] );
@@ -47,8 +47,12 @@ class Admin
         Template::enqueue_style('styles');
     }
 
-    public function handle_ajax_scan_plugin()
+    public function handle_ajax_scan_plugin(): void
     {
+        if ($this->check_ajax_referer('nonceTest')) {
+            return;
+        }
+
         if (!isset($_POST['plugin_file'])) {
             wp_send_json_error([
                 'error' => __('No plugin file was provided.', WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN)
@@ -63,13 +67,8 @@ class Admin
                 'Version' => sanitize_text_field($_POST['version']),
             ];
 
-            $WF_data_feed = WordFenceVulnerabilityDataFeed::instance();
-            $wf_response = $WF_data_feed->scan_plugin($plugin_data, true);
-
-            $Wp_vuln_data_feed = WpVulnerabilityDataFeed::instance();
-            $wp_vuln_response = $Wp_vuln_data_feed->scan_plugin($plugin_data, true);
-
-            $results = array_filter([$wp_vuln_response, $wf_response]);
+            $scanner = new PluginScannerHandler($plugin_data, true);
+            $results = $scanner->get_results();
 
             wp_send_json_success([
                 'results' => $results,

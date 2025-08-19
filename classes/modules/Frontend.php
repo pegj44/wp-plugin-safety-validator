@@ -1,6 +1,8 @@
 <?php
 
-namespace WP_PluginSafetyValidator;
+namespace WP_PluginSafetyValidator\Modules;
+
+use WP_PluginSafetyValidator\Helpers\Template;
 
 if (!defined('ABSPATH')) die('Access denied.');
 

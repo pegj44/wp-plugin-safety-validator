@@ -1,6 +1,6 @@
 <?php
 
-use WP_PluginSafetyValidator\traits\AjaxTrait;
+namespace WpPluginSafetyValidator\Helpers;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
@@ -78,11 +78,11 @@ class JobManager
      * Wrapper: queues the original REST callback for background execution.
      * Returns 202 + job_id immediately.
      */
-    public function rest_enqueue_wrapper( WP_REST_Request $request )
+    public function rest_enqueue_wrapper( \WP_REST_Request $request )
     {
         $meta = $request->get_attributes();
         if ( empty( $meta['args']['__bg_enabled'] ) || empty( $meta['args']['__bg_cb'] ) ) {
-            return new WP_Error( 'bg_invalid', 'Background wrapper misconfigured.', array( 'status' => 500 ) );
+            return new \WP_Error( 'bg_invalid', 'Background wrapper misconfigured.', array( 'status' => 500 ) );
         }
         $cb = $meta['args']['__bg_cb'];
 
@@ -125,7 +125,7 @@ class JobManager
         }
 
         // Respond with 202 Accepted and the job id.
-        return new WP_REST_Response( array( 'job_id' => $job_id ), 202 );
+        return new \WP_REST_Response( array( 'job_id' => $job_id ), 202 );
     }
 
     /**
@@ -144,7 +144,7 @@ class JobManager
             }
 
             // Rebuild request.
-            $req = new WP_REST_Request( $payload['method'], '/' . ltrim( $payload['namespace'] . '/' . ltrim( $payload['route'], '/' ), '/' ) );
+            $req = new \WP_REST_Request( $payload['method'], '/' . ltrim( $payload['namespace'] . '/' . ltrim( $payload['route'], '/' ), '/' ) );
             if ( ! empty( $payload['headers'] ) && is_array( $payload['headers'] ) ) {
                 $req->set_headers( $payload['headers'] );
             }
@@ -167,7 +167,7 @@ class JobManager
             // Resolve original callback.
             $callable = ( $payload['cb']['type'] === 'array' ) ? $payload['cb']['value'] : $payload['cb']['value'];
             if ( ! is_callable( $callable ) ) {
-                throw new RuntimeException( 'Original callback is not callable at runtime.' );
+                throw new \RuntimeException( 'Original callback is not callable at runtime.' );
             }
 
             // Execute.
@@ -182,7 +182,7 @@ class JobManager
                 'result'  => $stored,
             ) );
 
-        } catch ( Throwable $e ) {
+        } catch ( \Throwable $e ) {
             $this->update_status( $job_id, array(
                 'status'  => 'failed',
                 'message' => 'Error: ' . $e->getMessage(),
@@ -239,7 +239,7 @@ class JobManager
         return false; // Closures/objects not supported for background execution.
     }
     protected function normalize_result_for_storage( $result ) {
-        if ( $result instanceof WP_REST_Response ) {
+        if ( $result instanceof \WP_REST_Response ) {
             return array(
                 'data'   => $result->get_data(),
                 'status' => $result->get_status(),
@@ -260,8 +260,8 @@ class JobManager
     }
 
     /** Error response for unsupported callbacks (e.g., closures). */
-    public function rest_bad_callback_response( WP_REST_Request $request ) {
-        return new WP_Error( 'bg_callback_unsupported', 'Background route requires a string or [Class,method] callback (no closures).', array( 'status' => 500 ) );
+    public function rest_bad_callback_response( \WP_REST_Request $request ) {
+        return new \WP_Error( 'bg_callback_unsupported', 'Background route requires a string or [Class,method] callback (no closures).', array( 'status' => 500 ) );
     }
 }
 
@@ -271,7 +271,7 @@ class JobManager
  * 1) Bootstrap the manager once (e.g., in your plugin main file).
  */
 function myplugin_boot_bg_manager() {
-    $GLOBALS['myplugin_bg'] = new WP_Background_Job_Manager( 'myplugin', 'myplugin-group', 3600 );
+    $GLOBALS['myplugin_bg'] = new JobManager( 'myplugin', 'myplugin-group', 3600 );
 }
 add_action( 'plugins_loaded', 'myplugin_boot_bg_manager', 5 );
 
@@ -307,7 +307,7 @@ function myplugin_register_status_route() {
  * 3) Your original callback (will now be executed in background by the manager).
  *    IMPORTANT: It must be a named function or ['Class','method'] (no closures).
  */
-function myplugin_rest_job_status( WP_REST_Request $request ) {
+function myplugin_rest_job_status( \WP_REST_Request $request ) {
     $job_id = sanitize_text_field( $request['job_id'] );
 
     // Simulate heavy work (replace with real logic).
@@ -318,11 +318,11 @@ function myplugin_rest_job_status( WP_REST_Request $request ) {
         'message' => 'Heavy status calculation done in background.',
     );
 
-    return new WP_REST_Response( $data, 200 );
+    return new \WP_REST_Response( $data, 200 );
 }
 
 /** Permissions + validators (standard). */
-function myplugin_can_view_status( WP_REST_Request $request ) {
+function myplugin_can_view_status( \WP_REST_Request $request ) {
     return current_user_can( 'edit_posts' ) && wp_verify_nonce( $request->get_header( 'X-WP-Nonce' ), 'wp_rest' );
 }
 function myplugin_validate_job_id( $value, $request, $key ) {

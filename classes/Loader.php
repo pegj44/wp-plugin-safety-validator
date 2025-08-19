@@ -21,7 +21,7 @@ class Loader
         $this->namespace = 'WP_PluginSafetyValidator\\'. ucfirst($classDir);
 
         // Store in a filter hook to allow other plugins or themes to register their classes or exclude classes
-        add_filter(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'-register_'. $this->classBaseDir, [$this, 'register_classes'], 10);
+        add_filter(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_register_'. $this->classBaseDir, [$this, 'register_classes'], 10);
     }
 
     public function register_classes( array $classes ): array
@@ -43,7 +43,7 @@ class Loader
 
     public function load_classes(): void
     {
-        $invokeClasses = apply_filters( WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'-register_'. $this->classBaseDir, [] );
+        $invokeClasses = apply_filters( WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_register_'. $this->classBaseDir, [] );
 
         foreach ($invokeClasses as $class => $class_instance) {
             $this->instances[$class] = $class_instance::instance();
