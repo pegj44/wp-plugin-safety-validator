@@ -9,8 +9,7 @@ if (!defined('ABSPATH')) die('Access denied.');
  */
 class PluginScannerHandler
 {
-    private $plugin_data;
-    private $save_data;
+    private $args;
 
     /**
      * Store the classes that perform actual plugin scanning
@@ -24,18 +23,36 @@ class PluginScannerHandler
 
     private $results = [];
 
-    public function __construct($plugin_data, $save_data)
+    public function __construct($args = [])
     {
-        $this->plugin_data = $plugin_data;
-        $this->save_data = $save_data;
+        $this->args = $args;
     }
 
     private function invoke_plugin_scanner_classes(): void
     {
         foreach ($this->plugin_scanner_classes as $class) {
-            $scanner = new $class();
-            $this->results[] = $scanner->scan_plugin($this->plugin_data, $this->save_data);
+            if (isset($this->args['plugin_data']) && isset($this->args['save_data'])) {
+                $scanner = new $class();
+                $this->results[] = $scanner->scan_plugin($this->args['plugin_data'], $this->args['save_data']);
+            }
         }
+    }
+
+    public function get_recorded_results()
+    {
+        $saved_records = [];
+
+        foreach ($this->plugin_scanner_classes as $class) {
+            $instance = $class::instance();
+
+            if (property_exists($instance, 'option_record_key') &&
+                property_exists($instance, 'scanner_name')) {
+                $option_key = $instance->option_record_key;
+                $saved_records[$instance->scanner_name] = get_option($option_key, []);
+            }
+        }
+
+        return $saved_records;
     }
 
     public function get_results(): array
