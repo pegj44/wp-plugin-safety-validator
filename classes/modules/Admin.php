@@ -2,10 +2,10 @@
 
 namespace WP_PluginSafetyValidator\Modules;
 
-use WP_PluginSafetyValidator\Helpers\Template;
+use WP_PluginSafetyValidator\Support\Traits\Ajax\AjaxTrait;
 use WP_PluginSafetyValidator\Helpers\VersionChecker;
 use WP_PluginSafetyValidator\PluginScannerHandler;
-use WP_PluginSafetyValidator\traits\AjaxTrait;
+use WP_PluginSafetyValidator\Support\Templates\Template;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
@@ -36,7 +36,7 @@ class Admin
     {
         $this->bootstrap_admin_ajax_actions();
 
-//        delete_option(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_wpv_scan_record');
+        delete_option(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_wpv_scan_record');
 
         add_action( 'after_plugin_row', [$this, 'render_notice_row'], 10, 3 );
         add_action( 'admin_enqueue_scripts', [$this, 'enqueue_scripts'] );

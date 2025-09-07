@@ -1,6 +1,6 @@
 <?php
 
-namespace WpPluginSafetyValidator\Helpers;
+namespace WP_PluginSafetyValidator\Support\Processes;
 
 if (!defined('ABSPATH')) die('Access denied.');
 

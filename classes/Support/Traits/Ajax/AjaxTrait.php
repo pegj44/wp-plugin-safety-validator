@@ -1,6 +1,6 @@
 <?php
 
-namespace WP_PluginSafetyValidator\traits;
+namespace WP_PluginSafetyValidator\Support\Traits\Ajax;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
@@ -24,7 +24,9 @@ trait AjaxTrait
      */
     public function bootstrap_admin_ajax_actions(): void
     {
-        add_action('plugins_loaded', [$this, 'initiate_admin_ajax_actions']);
+        add_action( 'plugins_loaded', [$this, 'initiate_admin_ajax_actions'] );
+        add_action( 'admin_head', [$this, 'add_nonce_to_header'] );
+        add_action( 'admin_enqueue_scripts', [$this, 'enqueue_ajax_scripts'] );
     }
 
     /**
@@ -35,6 +37,8 @@ trait AjaxTrait
     public function bootstrap_frontend_ajax_actions(): void
     {
         add_action( 'plugins_loaded', [$this, 'initiate_frontend_ajax_actions'] );
+        add_action( 'wp_head', [$this, 'add_nonce_to_header'] );
+        add_action( 'wp_enqueue_scripts', [$this, 'enqueue_ajax_scripts'] );
     }
 
     /**
@@ -93,14 +97,13 @@ trait AjaxTrait
                 // create nonce for each ajax action
                 $this->nonce[$actionName] = $this->create_nonce($actionName);
             }
+        }
+    }
 
-            if ($context === 'admin') {
-                add_action('admin_head', [$this, 'add_nonce_to_header']);
-            }
-
-            if ($context === 'frontend') {
-                add_action('wp_head', [$this, 'add_nonce_to_header']);
-            }
+    public function enqueue_ajax_scripts()
+    {
+        if (class_exists('WP_PluginSafetyValidator\Support\Templates\Template')) {
+            \WP_PluginSafetyValidator\Support\Templates\Template::enqueue_script('pegj', [], [], true);
         }
     }
 
@@ -116,7 +119,8 @@ trait AjaxTrait
     public function add_nonce_to_header(): void
     {
         echo '<script type="text/javascript">';
-            echo 'const '. WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_ajax = '. wp_json_encode([
+        echo 'const pegj_ajax = '. wp_json_encode([
+                'handle' => WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN,
                 'ajax_url' => admin_url( 'admin-ajax.php' ),
                 'nonce' => $this->nonce,
             ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );

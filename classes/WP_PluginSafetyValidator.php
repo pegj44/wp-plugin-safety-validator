@@ -2,8 +2,6 @@
 
 namespace WP_PluginSafetyValidator;
 
-use WP_PluginSafetyValidator\Helpers\Template;
-
 if (!defined('ABSPATH')) die('Access denied.');
 
 /**
@@ -60,9 +58,9 @@ class WP_PluginSafetyValidator
      */
     public function register_scripts_and_styles(): void
     {
-        if (class_exists('WP_PluginSafetyValidator\Helpers\Template')) {
+        if (class_exists('WP_PluginSafetyValidator\Support\Templates\Template')) {
             add_action( 'admin_enqueue_scripts', function() {
-                Template::initiate_register_styles_and_scripts();
+                \WP_PluginSafetyValidator\Support\Templates\Template::initiate_register_styles_and_scripts();
             });
         }
     }
