@@ -17,28 +17,23 @@ class Loader
     public function __construct($classDir)
     {
         $this->classBaseDir = basename($classDir);
-        $this->classDir = WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/classes/'. $classDir .'/*.php';
-        $this->namespace = 'WP_PluginSafetyValidator\\'. ucfirst($classDir);
+        $this->classDir = WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/classes/'. $classDir .'/'. $classDir .'.php';
 
         // Store in a filter hook to allow other plugins or themes to register their classes or exclude classes
         add_filter(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_register_'. $this->classBaseDir, [$this, 'register_classes'], 10);
     }
 
-    public function register_classes( array $classes ): array
+    public function register_classes( array $classesArray ): array
     {
-        foreach (glob($this->classDir) as $file) {
-            $classFile = basename($file, '.php');
-            $className = $this->namespace ? $this->namespace . '\\' . $classFile : $classFile;
+        $classes = require_once $this->classDir;
 
-            if (class_exists($className) &&
-                !isset($this->instances[$classFile]) &&
-                method_exists($className, 'instance')) {
-
-                $classes[$classFile] = $className;
+        foreach ($classes as $className) {
+            if (class_exists($className) && method_exists($className, 'instance')) {
+                $classesArray[$className] = $className;
             }
         }
 
-        return $classes;
+        return $classesArray;
     }
 
     public function load_classes(): void

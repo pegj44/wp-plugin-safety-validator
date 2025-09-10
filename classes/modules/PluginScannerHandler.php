@@ -1,6 +1,6 @@
 <?php
 
-namespace WP_PluginSafetyValidator;
+namespace WP_PluginSafetyValidator\Modules;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
@@ -38,7 +38,17 @@ class PluginScannerHandler
         }
     }
 
-    public function get_recorded_results()
+    /**
+     * Retrieves recorded results from plugin scanner classes.
+     *
+     * This method iterates through the defined plugin scanner classes,
+     * retrieves their stored option keys, and gathers the recorded data
+     * associated with those keys. The results are indexed by the scanner's name.
+     *
+     * @return array An associative array of recorded results, where the keys are
+     * scanner names and the values are the recorded data.
+     */
+    public function get_recorded_results(): array
     {
         $saved_records = [];
 

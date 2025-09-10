@@ -30,9 +30,28 @@ if ( ! defined( 'WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN' ) ) {
     define( 'WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN', 'wp_plugin_safety_validator' );
 }
 
+/**
+ * Autoload classes
+ */
 require_once WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/vendor/autoload.php';
 
+add_action('plugins_loaded', function () {
+    if (!function_exists('\as_enqueue_async_action')) {
+        $as_bootstrap = WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/vendor/woocommerce/action-scheduler/action-scheduler.php';
+        if (file_exists($as_bootstrap)) {
+            require_once $as_bootstrap;
+        }
+    }
+}, 1);
+
 if (!class_exists('WP_PluginSafetyValidator')) :
+
+    /**
+     * Register activation hook
+     */
+    register_activation_hook(__FILE__, function () {
+        require_once WP_PLUGIN_SAFETY_VALIDATOR_DIR . '/activate.php';
+    });
 
     /**
      * Create a singleton instance of the WP_PluginSafetyValidator class

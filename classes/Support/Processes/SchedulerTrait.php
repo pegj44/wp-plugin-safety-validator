@@ -1,6 +1,6 @@
 <?php
 
-namespace WP_PluginSafetyValidator\traits;
+namespace WP_PluginSafetyValidator\Support\Processes;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
@@ -17,12 +17,12 @@ if (!defined('ABSPATH')) die('Access denied.');
 trait SchedulerTrait
 {
     /**
-     * Registers cron interval filter, scheduling, and event hooks.
+     * Initiates cron interval filter, scheduling, and event hooks.
      * Call this once in the class to enable all custom schedules.
      *
      * @return void
      */
-    public function register_schedulers(): void
+    public function initiate_schedulers(): void
     {
         add_filter('cron_schedules', [$this, 'add_custom_intervals']);
         add_action('wp', [$this, 'schedule_events']);

@@ -128,5 +128,4 @@ class WP_PluginSafetyValidator
     {
         return $this->plugins->get_all_class_instances();
     }
-
 } // end class

@@ -1,6 +1,6 @@
 <?php
 
-namespace WP_PluginSafetyValidator\Support\Traits\Ajax;
+namespace WP_PluginSafetyValidator\Support\Traits;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
