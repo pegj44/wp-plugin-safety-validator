@@ -58,9 +58,9 @@ class WP_PluginSafetyValidator
      */
     public function register_scripts_and_styles(): void
     {
-        if (class_exists('WP_PluginSafetyValidator\Support\Templates\Template')) {
+        if (class_exists('Pegj\Support\Templates\Template')) {
             add_action( 'admin_enqueue_scripts', function() {
-                \WP_PluginSafetyValidator\Support\Templates\Template::initiate_register_styles_and_scripts();
+                \Pegj\Support\Templates\Template::initiate_register_styles_and_scripts();
             });
         }
     }

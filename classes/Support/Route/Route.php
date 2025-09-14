@@ -1,8 +1,12 @@
 <?php
 
-namespace WP_PluginSafetyValidator\Support\Route;
+namespace Pegj\Support\Route;
 
-if (!defined('ABSPATH')) die('Access denied.');
+if (defined('PEGJ_ROUTE_DIR')) {
+    return;
+}
+
+define( 'PEGJ_ROUTE_DIR', __DIR__ );
 
 class Route
 {

@@ -1,0 +1,14 @@
+{
+  "name": "wp-pegj/pegj",
+  "description": "WordPress support classes.",
+  "type": "library",
+  "version": "1.0.0",
+  "autoload": {
+    "psr-4": {
+      "Pegj\\": "src/"
+    },
+    "files": [
+      "src/functions.php"
+    ]
+  }
+}

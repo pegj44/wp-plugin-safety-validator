@@ -1,8 +1,12 @@
 <?php
 
-namespace WP_PluginSafetyValidator\Support\Processes;
+namespace Pegj\Support\Processes;
 
-if (!defined('ABSPATH')) die('Access denied.');
+if (defined('PEGJ_BACKGROUND_PROCESS_DIR')) {
+    return;
+}
+
+define( 'PEGJ_BACKGROUND_PROCESS_DIR', __DIR__ );
 
 /**
  * Generic background job bus using Action Scheduler.

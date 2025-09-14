@@ -1,8 +1,12 @@
 <?php
 
-namespace WP_PluginSafetyValidator\Support\Traits;
+namespace Pegj\Support\Traits;
 
-if (!defined('ABSPATH')) die('Access denied.');
+if (defined('PEGJ_AJAX_TRAIT_DIR')) {
+    return;
+}
+
+define( 'PEGJ_AJAX_TRAIT_DIR', __DIR__ );
 
 /**
  * Trait for adding, managing, and executing custom WP-Ajax in a reusable way.
@@ -102,8 +106,8 @@ trait AjaxTrait
 
     public function enqueue_ajax_scripts()
     {
-        if (class_exists('WP_PluginSafetyValidator\Support\Templates\Template')) {
-            \WP_PluginSafetyValidator\Support\Templates\Template::enqueue_script('pegj', [], [], true);
+        if (class_exists('Pegj\Support\Templates\Template')) {
+            \Pegj\Support\Templates\Template::enqueue_script('pegj', [], [], true);
         }
     }
 

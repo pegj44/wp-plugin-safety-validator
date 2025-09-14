@@ -3,8 +3,8 @@
 namespace WP_PluginSafetyValidator\Modules;
 
 use WP_PluginSafetyValidator\Helpers\VersionChecker;
-use WP_PluginSafetyValidator\Support\Templates\Template;
-use WP_PluginSafetyValidator\Support\Traits\AjaxTrait;
+use Pegj\Support\Templates\Template;
+use Pegj\Support\Traits\AjaxTrait;
 
 if (!defined('ABSPATH')) die('Access denied.');
 
@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) die('Access denied.');
  */
 class Admin
 {
-    use AjaxTrait;
+//    use AjaxTrait;
 
     protected static $_instance;
 
@@ -33,7 +33,7 @@ class Admin
 
     public function __construct()
     {
-        $this->bootstrap_admin_ajax_actions();
+//        $this->bootstrap_admin_ajax_actions();
 
 //        delete_option(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_wpv_scan_record');
 
@@ -120,7 +120,7 @@ class Admin
             $classes .= ' active';
         }
 
-        return Template::load_admin_view('plugin-issue-notification', [
+        return Template::load_admin_template('plugin-issue-notification', [
             'classes' => $classes,
             'plugin_file' => $plugin_file,
             'message' => __('IMPORTANT! - This plugin has been identified as vulnerable to a known security issue. Please update as soon as possible.', WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN),
@@ -145,7 +145,7 @@ class Admin
             return $actions;
         }
 
-        $actions['scan'] = Template::load_admin_view('plugin-scan-button', [
+        $actions['scan'] = Template::load_admin_template('plugin-scan-button', [
             'slug' => $slug,
             'version' => $plugin_data['Version'],
             'plugin_file' => $plugin_file

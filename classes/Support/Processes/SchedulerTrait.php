@@ -1,8 +1,12 @@
 <?php
 
-namespace WP_PluginSafetyValidator\Support\Processes;
+namespace Pegj\Support\Processes;
 
-if (!defined('ABSPATH')) die('Access denied.');
+if (defined('PEGJ_SCHEDULER_TRAIT_DIR')) {
+    return;
+}
+
+define( 'PEGJ_SCHEDULER_TRAIT_DIR', __DIR__ );
 
 /**
  * Trait for adding, managing, and executing custom WP-Cron schedules in a reusable way.

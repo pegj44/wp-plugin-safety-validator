@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c3373d280453177052ea657d79cc526b",
+    "content-hash": "7b4359e6b6478618b0f97cb036b756a1",
     "packages": [
         {
             "name": "woocommerce/action-scheduler",
@@ -44,6 +44,29 @@
                 "source": "https://github.com/woocommerce/action-scheduler/tree/3.0.0"
             },
             "time": "2020-01-03T05:20:20+00:00"
+        },
+        {
+            "name": "wp-pegj/pegj",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "./pegj",
+                "reference": "d6646cac71861c975f738e9b3c472c8e33b66066"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Pegj\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "description": "WordPress support classes.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         }
     ],
     "packages-dev": [

@@ -1,8 +1,12 @@
 <?php
 
-namespace WP_PluginSafetyValidator\Support\Files;
+namespace Pegj\Support\Files;
 
-if (!defined('ABSPATH')) die('Access denied.');
+if (defined('PEGJ_FILE_DOWNLOADER_DIR')) {
+    return;
+}
+
+define( 'PEGJ_FILE_DOWNLOADER_DIR', __DIR__ );
 
 /**
  * This class handles the downloading of files from any URL into wp-content/uploads/subdir.
