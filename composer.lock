@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b4359e6b6478618b0f97cb036b756a1",
+    "content-hash": "40cc4fc12f1a30e18b6eaf1eaf9be2e0",
     "packages": [
         {
             "name": "woocommerce/action-scheduler",
@@ -47,26 +47,45 @@
         },
         {
             "name": "wp-pegj/pegj",
-            "version": "1.0.0",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pegj44/wp-pegj.git",
+                "reference": "49e515ad7c25e2e73ca9ff2a3d8a9a272c54d97c"
+            },
             "dist": {
-                "type": "path",
-                "url": "./pegj",
-                "reference": "d6646cac71861c975f738e9b3c472c8e33b66066"
+                "type": "zip",
+                "url": "https://api.github.com/repos/pegj44/wp-pegj/zipball/49e515ad7c25e2e73ca9ff2a3d8a9a272c54d97c",
+                "reference": "49e515ad7c25e2e73ca9ff2a3d8a9a272c54d97c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "Pegj\\": "src/"
-                },
                 "files": [
                     "src/functions.php"
-                ]
+                ],
+                "psr-4": {
+                    "Pegj\\": "src/"
+                }
             },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Paul Edmund Janubas"
+                }
+            ],
             "description": "WordPress support classes.",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "support": {
+                "issues": "https://github.com/pegj44/wp-pegj/issues",
+                "source": "https://github.com/pegj44/wp-pegj/tree/v1.0.1"
+            },
+            "time": "2025-09-19T17:00:34+00:00"
         }
     ],
     "packages-dev": [

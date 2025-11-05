@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) die('Access denied.');
  */
 class Admin
 {
-//    use AjaxTrait;
+    use AjaxTrait;
 
     protected static $_instance;
 
@@ -33,7 +33,7 @@ class Admin
 
     public function __construct()
     {
-//        $this->bootstrap_admin_ajax_actions();
+        $this->bootstrap_admin_ajax_actions();
 
 //        delete_option(WP_PLUGIN_SAFETY_VALIDATOR_DOMAIN .'_wpv_scan_record');
 
